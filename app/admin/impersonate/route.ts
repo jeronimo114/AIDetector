@@ -4,6 +4,13 @@ import crypto from "node:crypto";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
+type ImpersonationSession = {
+  id: string;
+  target_user_id: string;
+  expires_at: string;
+  used_at: string | null;
+};
+
 export async function GET(request: Request) {
   const supabase = createSupabaseServerClient();
   const {
@@ -34,11 +41,13 @@ export async function GET(request: Request) {
   const admin = getSupabaseAdminClient();
   const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
-  const { data: session } = await admin
+  const { data } = await admin
     .from("impersonation_sessions")
     .select("id, target_user_id, expires_at, used_at")
     .eq("token_hash", tokenHash)
     .single();
+
+  const session = data as ImpersonationSession | null;
 
   if (!session || session.used_at || new Date(session.expires_at) < new Date()) {
     return NextResponse.redirect(new URL("/admin/users", request.url));
