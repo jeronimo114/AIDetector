@@ -17,7 +17,7 @@ export default async function AdminAuditPage() {
     .order("created_at", { ascending: false })
     .limit(50);
 
-  const audit = (data ?? []) as AuditRow[];
+  const audit: AuditRow[] = Array.isArray(data) ? (data as AuditRow[]) : [];
 
   return (
     <div className="space-y-6">
@@ -37,7 +37,7 @@ export default async function AdminAuditPage() {
             </tr>
           </thead>
           <tbody>
-            {audit.map((row) => (
+            {audit.map((row: AuditRow) => (
               <tr key={row.id} className="border-t border-[#eee9db]">
                 <td className="py-3 text-[#1f1d18]">{row.action}</td>
                 <td className="py-3 text-[#4f4a40]">
