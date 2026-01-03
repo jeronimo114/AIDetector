@@ -1,5 +1,14 @@
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 
+type AuditRow = {
+  id: string;
+  actor_id: string | null;
+  action: string;
+  target_type: string;
+  target_id: string | null;
+  created_at: string;
+};
+
 export default async function AdminAuditPage() {
   const admin = getSupabaseAdminClient();
   const { data } = await admin
@@ -8,7 +17,7 @@ export default async function AdminAuditPage() {
     .order("created_at", { ascending: false })
     .limit(50);
 
-  const audit = data ?? [];
+  const audit = (data ?? []) as AuditRow[];
 
   return (
     <div className="space-y-6">
